@@ -10,3 +10,30 @@
 Develop an automatic segmentation/classification algorithm for agricultural land using GeoTIFF orthomosaics captured by UAS (GSD ~10 cm/pixel). The solution should delineate classes (e.g., cropland, road, shelterbelt/forest belt, water body, etc.) and handle tiling without losing georeferencing (e.g., via GDAL). Deliverables: a trained model with weights and, if possible, a simple UI; the partner provides labeled data totaling ~1,000 megapixels.
 
 
+# Команда Национального исследовательского Томского государственного университета
+
+- Бондарчук А.С
+    - mail: ddubstepov@gmail.com
+    - роль: системный инженер
+- Колоев М.И.
+    - mail: maxkolo57@gmail.com
+    - роль: ML-инженер
+- Крючков Д.Д.
+    - mail: ddubstepov@gmail.com
+    - роль: инженер по данным
+- Чернов С.А.
+    - mail: sergej.chernov2003@gmail.com
+    - роль: инженер-конструктор БАС 
+
+
+# Архитектура ИИ-модели
+
+???
+
+# Обоснованность выбора инструмента
+
+???
+
+# Структура программы
+
+???
