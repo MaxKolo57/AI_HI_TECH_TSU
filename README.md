@@ -42,13 +42,20 @@ bash run.sh
 
 ### 1.1. Структура файлов и директорий
 
-project_root/
+project_root/ 
+
 ├── core/
+
 │   ├── processing.py        # Нарезка тайлов, реконструкция маски, экспорт GeoTIFF
+
 │   └── segmentation.py      # Логика сегментации: простая (цветовая) → модель (SegFormer)
+
 ├── models/
+
 │   └── 00100.pt             # Предобученная модель SegFormer (10 классов)
+
 ├── ui_mainwindow.py         # PyQt5 UI: загрузка, сегментация, превью, экспорт
+
 └── main.py                  # Запуск GUI (подразумевается)
 
 
@@ -56,8 +63,11 @@ project_root/
 ### 1.2. Временная рабочая директория (создаётся при запуске)
 
 /tmp/ortho_seg_xxxxxx/        # tempfile.mkdtemp()
+
 ├── images/                   # PNG-тайлы 512×512 (с zero-padding)
+
 ├── masks/                    # mask_XXXX_XXXX.npy — результаты сегментации (RGB или uint8)
+
 └── meta/                     # tile_XXXX_XXXX.json — метаданные (координаты, transform, CRS)
 
 
