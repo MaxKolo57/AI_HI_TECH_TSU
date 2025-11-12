@@ -14,7 +14,9 @@ https://drive.google.com/drive/folders/1QgPXCPgAIAqRKDVx_U73O_hpCteFUXcr?usp=dri
     /drone — код программы обработки видео с дрона.  
     /land_segmentation — код программы сегментации ортофотопланов.  
     /train — код, используемый для обучения нейронной сети.
-     
+
+Список зависимостей для программы по обработке ортофотопланов находится в файле src/land_segmentation/requirements.txt.
+
 
 # AI_HI_TECH_TSU
 
