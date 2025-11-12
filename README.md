@@ -1,4 +1,4 @@
-# Ссылка на google вдиск
+# Ссылка на google диск
 https://drive.google.com/drive/folders/1QgPXCPgAIAqRKDVx_U73O_hpCteFUXcr?usp=drive_link
 
 # AI_HI_TECH_TSU
