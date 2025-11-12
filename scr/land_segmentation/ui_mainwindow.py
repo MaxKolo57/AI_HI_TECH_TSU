@@ -7,19 +7,19 @@ import numpy as np
 import rasterio
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog,
-    QMessageBox, QProgressBar, QTextEdit, QSizePolicy, QScrollArea
+    QMessageBox, QProgressBar, QTextEdit, QSizePolicy, QScrollArea, QFrame, QGridLayout
 )
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 
-from core.segmentation import SegmentationWorker
+from core.segmentation import SegmentationWorker, mask_to_rgb_preview, CLASS_MAP, CLASS_COLORS
 
 
 class OrthoSegApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Ortho Segmentation — demo")
-        self.resize(1000, 700)
+        self.resize(1200, 700)
 
         self.tif_path = None
         self.tmp_dir = None  # временная директория
@@ -34,7 +34,6 @@ class OrthoSegApp(QWidget):
         event.accept()
 
     def _cleanup_tmp(self):
-        """Удаляет текущую временную директорию, если она существует"""
         if self.tmp_dir and Path(self.tmp_dir).exists():
             try:
                 shutil.rmtree(self.tmp_dir)
@@ -68,6 +67,13 @@ class OrthoSegApp(QWidget):
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_exit)
 
+        # Легенда под кнопками
+        self.legend_frame = QFrame()
+        self.legend_layout = QVBoxLayout()
+        self.legend_frame.setLayout(self.legend_layout)
+        self._build_legend()  # заполняем цветные квадраты и названия
+        btn_layout.addWidget(self.legend_frame)
+
         # Превью изображения
         self.image_label = QLabel("Здесь будет превью загруженного ортофотоплана")
         self.image_label.setAlignment(Qt.AlignCenter)
@@ -92,11 +98,23 @@ class OrthoSegApp(QWidget):
 
         self.setLayout(main_layout)
 
+    def _build_legend(self):
+        """Создает вертикальную легенду классов с цветами"""
+        for cls_id, cls_name in CLASS_MAP.items():
+            h_layout = QHBoxLayout()
+            color = CLASS_COLORS[cls_id]
+            color_box = QLabel()
+            color_box.setFixedSize(20, 20)
+            color_box.setStyleSheet(f"background-color: rgb{color}; border: 1px solid black;")
+            label = QLabel(cls_name)
+            h_layout.addWidget(color_box)
+            h_layout.addWidget(label)
+            self.legend_layout.addLayout(h_layout)
+
     def log_msg(self, text):
         self.log.append(text)
 
     def on_load(self):
-        """Загрузка нового ортофотоплана"""
         fn, _ = QFileDialog.getOpenFileName(self, "Выберите GeoTIFF файл", ".", "GeoTIFF Files (*.tif *.tiff)")
         if not fn:
             return
@@ -146,7 +164,6 @@ class OrthoSegApp(QWidget):
             self.log_msg(f"Ошибка превью: {e}")
 
     def on_segment(self):
-        """Запуск сегментации"""
         if not self.tif_path:
             QMessageBox.warning(self, "Внимание", "Сначала загрузите файл.")
             return
@@ -158,7 +175,6 @@ class OrthoSegApp(QWidget):
         self.log.clear()
         self.log_msg("Запуск процесса сегментации...")
 
-        # SegmentationWorker использует временную директорию
         self.worker = SegmentationWorker(self.tif_path, self.tmp_dir)
         self.worker.progress.connect(self.progress.setValue)
         self.worker.message.connect(self.log_msg)
@@ -166,7 +182,6 @@ class OrthoSegApp(QWidget):
         self.worker.start()
 
     def on_finished(self, info):
-        """Обработка завершения сегментации"""
         self.btn_load.setEnabled(True)
         self.btn_segment.setEnabled(True)
         if info.get("error"):
@@ -182,16 +197,20 @@ class OrthoSegApp(QWidget):
 
         try:
             mask = np.load(info["mask_npy"])
-            img8 = (mask * 255).astype(np.uint8)
-            h0, w0 = img8.shape
-            qimg = QImage(img8.data, w0, h0, w0, QImage.Format_Grayscale8)
+            # Если маска уже RGB (3 канала) — используем напрямую
+            if mask.ndim == 3:
+                rgb = mask
+            else:
+                rgb = mask_to_rgb_preview(mask)
+
+            h0, w0, _ = rgb.shape
+            qimg = QImage(rgb.data, w0, h0, 3 * w0, QImage.Format_RGB888)
             pix = QPixmap.fromImage(qimg)
             self.image_label.setPixmap(pix.scaled(self.image_label.size(), Qt.KeepAspectRatio))
         except Exception as e:
             self.log_msg(f"Ошибка отображения маски: {e}")
 
     def on_save(self):
-        """Сохранение финального mask.tif в выбранную пользователем папку"""
         if not self.last_result:
             QMessageBox.warning(self, "Нет результатов", "Сначала выполните сегментацию.")
             return
