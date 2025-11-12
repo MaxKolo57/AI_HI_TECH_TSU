@@ -1,3 +1,6 @@
+# Ссылка на google вдиск
+https://drive.google.com/drive/folders/1QgPXCPgAIAqRKDVx_U73O_hpCteFUXcr?usp=drive_link
+
 # AI_HI_TECH_TSU
 
 # ТЕХНОЛОГИИ ИИ В КОМПЛЕКСНЫХ БЕСПИЛОТНЫХ СИСТЕМАХ 
@@ -36,6 +39,15 @@ bash install.sh
 
 После успешной установки зависимостей запустите программу с помощью команды:  
 bash run.sh
+
+# Результат
+
+Веса модели находятся на Google Диске по ссылке https://drive.google.com/drive/folders/1QgPXCPgAIAqRKDVx_U73O_hpCteFUXcr?usp=drive_link
+Модель называется 00100.pt. Для работы программы её необходимо поместить в папку:  
+scr/land_segmentation/models
+
+Видео с демонстрацией работы программы также размещено на Google Диске.
+
 
 
 ## 1. Архитектура проекта (по уровням)
