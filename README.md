@@ -65,16 +65,8 @@ scr/land_segmentation/models
 
 ## 1. Архитектура программы по обработке ортофотоплана
 
-```mermaid
-flowchart LR
-    In["RGB тайл<br/>512×512×3<br/>(uint8, фрагмент GeoTIFF)"] --> Pre["Нормализация"]
-    Pre --> Model["SegFormer<br/>• encoder: resnext101_32x16d<br/>• 10 классов<br/>• weights: 00100.pt"]
-    Model --> Post["Постобработка:<br/>логиты → маска (0–9) →<br/>RGB по палитре CLASS_COLORS"]
-    Post --> Out["RGB-маска<br/>512×512×3<br/>(для визуализации)"]
+### Блок схема работы программы
 
-    classDef model fill:#d0e7ff,stroke:#0066cc,stroke-width:2px;
-    class Model model;
-```
 ```mermaid
 flowchart TB
     U["Пользователь"] --> A["Запуск run.sh → открытие GUI\n(«Ortho Segmentation — demo»)"]
@@ -97,6 +89,21 @@ flowchart TB
     classDef error fill:#ffe6e6,stroke:#cc0000;
     style D fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
 ```
+
+### Блок схема обработки данных моделью ИИ 
+
+```mermaid
+flowchart LR
+    In["RGB тайл<br/>512×512×3<br/>(uint8, фрагмент GeoTIFF)"] --> Pre["Нормализация"]
+    Pre --> Model["SegFormer<br/>• encoder: resnext101_32x16d<br/>• 10 классов<br/>• weights: 00100.pt"]
+    Model --> Post["Постобработка:<br/>логиты → маска (0–9) →<br/>RGB по палитре CLASS_COLORS"]
+    Post --> Out["RGB-маска<br/>512×512×3<br/>(для визуализации)"]
+
+    classDef model fill:#d0e7ff,stroke:#0066cc,stroke-width:2px;
+    class Model model;
+```
+
+
 
 ### 1.1. Структура файлов и директорий
 
