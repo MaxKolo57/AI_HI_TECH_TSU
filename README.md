@@ -67,7 +67,7 @@ scr/land_segmentation/models
 
 ```mermaid
 flowchart LR
-    In["RGB тайл<br/>512×512×3<br/>(uint8, фрагмент GeoTIFF)"] --> Pre["Нормализация<br/>(ImageNet: μ, σ)"]
+    In["RGB тайл<br/>512×512×3<br/>(uint8, фрагмент GeoTIFF)"] --> Pre["Нормализация"]
     Pre --> Model["SegFormer<br/>• encoder: resnext101_32x16d<br/>• 10 классов<br/>• weights: 00100.pt"]
     Model --> Post["Постобработка:<br/>логиты → маска (0–9) →<br/>RGB по палитре CLASS_COLORS"]
     Post --> Out["RGB-маска<br/>512×512×3<br/>(для визуализации)"]
