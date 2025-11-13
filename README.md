@@ -67,42 +67,35 @@ scr/land_segmentation/models
 
 ```mermaid
 flowchart LR
-    A["RGB тайл<br/>512×512×3<br/>(uint8, GeoTIFF фрагмент)"] --> B["Нормализация:<br/>ImageNet mean/std"]
-    B --> C["SegFormer<br/>- encoder: resnext101_32x16d<br/>- classes: 10<br/>- weights: 00100.pt"]
-    C --> D["Логиты<br/>10×512×512<br/>(float32)"]
-    D --> E["Argmax → маска<br/>512×512<br/>(uint8, значения 0–9)"]
-    E --> F["RGB-визуализация<br/>512×512×3<br/>(по палитре CLASS_COLORS)"]
+    In["RGB тайл<br/>512×512×3<br/>(uint8, фрагмент GeoTIFF)"] --> Pre["Нормализация<br/>(ImageNet: μ, σ)"]
+    Pre --> Model["SegFormer<br/>• encoder: resnext101_32x16d<br/>• 10 классов<br/>• weights: 00100.pt"]
+    Model --> Post["Постобработка:<br/>логиты → маска (0–9) →<br/>RGB по палитре CLASS_COLORS"]
+    Post --> Out["RGB-маска<br/>512×512×3<br/>(для визуализации)"]
 
     classDef model fill:#d0e7ff,stroke:#0066cc,stroke-width:2px;
-    class C model;
+    class Model model;
 ```
 ```mermaid
 flowchart TB
-    U["Пользователь"] -- "1. Запуск скрипта" --> A["run.sh"]
-    A --> B{"Запуск GUI?"}
-    B -- Да --> C["Главное окно: Ortho Segmentation - demo"]
-    B -- Нет --> Z["Ошибка: GUI не загружен"]
-    C -- "2. Выбор TIFF-файла" --> D["Диалог загрузки файла"]
-    D --> E{"Файл валиден?"}
-    E -- Нет --> Z1["Ошибка: некорректный файл"]
-    E -- Да --> F["Отображение превью + активация кнопки сегментации"]
-    F -- "3. Нажатие Сегментация ортофотоплана" --> G["Нарезка на тайлы 512×512"]
-    G --> H["Подготовка данных для модели"]
-    H --> I["Нейросетевая модель SegFormer\n- Архитектура: SegFormer resnext101_32x16d\n- Классы: 10\n- Устройство: GPU/CPU\n- Веса: models/00100.pt"]
-    I --> J["Предсказание маски для каждого тайла"]
-    J --> K["Реконструкция полной маски"]
-    K --> L["Визуализация RGB-маски в окне"]
-    L -- "4. Нажатие Сохранить результаты" --> M["Выбор папки сохранения"]
-    M --> N["Создание GeoTIFF: mask.tif\n1 канал, uint8, значения 0–9"]
-    N --> O["Подтверждение сохранения"]
-    O --> P{"Файл создан?"}
-    P -- Нет --> Z2["Ошибка записи"]
-    P -- Да --> Q["Успешное завершение"]
-     Z:::error
-     Z1:::error
-     Z2:::error
-    classDef error fill:#ffe6e6,stroke:#cc0000
-    style I fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    U["Пользователь"] --> A["Запуск run.sh → открытие GUI\n(«Ortho Segmentation — demo»)"]
+    A -->|Ошибка запуска| Z["Ошибка: GUI не загружен"]
+
+    A --> B["Загрузка TIFF-файла\n→ проверка формата и целостности"]
+    B -->|Некорректный файл| Z1["Ошибка: недопустимый файл"]
+
+    B --> C["Нарезка на тайлы 512×512\n→ подготовка данных для модели"]
+    C --> D["Сегментация тайлов через SegFormer:\n• encoder: resnext101_32x16d\n• 10 классов\n• weights: 00100.pt\n• устройство: GPU/CPU"]
+    D --> E["Реконструкция полной маски\n→ визуализация RGB-результата"]
+    E --> F["Сохранение результата:\nэкспорт mask.tif (GeoTIFF, 0–9, uint8)"]
+    F -->|Ошибка записи| Z2["Ошибка: не удалось сохранить файл"]
+    F -->|Успех| Q["Успешное завершение"]
+
+    Z:::error
+    Z1:::error
+    Z2:::error
+
+    classDef error fill:#ffe6e6,stroke:#cc0000;
+    style D fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
 ```
 
 ### 1.1. Структура файлов и директорий
